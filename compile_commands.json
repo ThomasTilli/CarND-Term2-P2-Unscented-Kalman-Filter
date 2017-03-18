@@ -1,0 +1,17 @@
+[
+{
+  "directory": "/home/tom/CarND/CarND-Unscented-Kalman-Filter-Project",
+  "command": "/usr/bin/g++     -g3 -gdwarf-2   -std=c++0x -o CMakeFiles/UnscentedKF.dir/src/tools.cpp.o -c /home/tom/CarND/CarND-Unscented-Kalman-Filter-Project/src/tools.cpp",
+  "file": "/home/tom/CarND/CarND-Unscented-Kalman-Filter-Project/src/tools.cpp"
+},
+{
+  "directory": "/home/tom/CarND/CarND-Unscented-Kalman-Filter-Project",
+  "command": "/usr/bin/g++     -g3 -gdwarf-2   -std=c++0x -o CMakeFiles/UnscentedKF.dir/src/ukf.cpp.o -c /home/tom/CarND/CarND-Unscented-Kalman-Filter-Project/src/ukf.cpp",
+  "file": "/home/tom/CarND/CarND-Unscented-Kalman-Filter-Project/src/ukf.cpp"
+},
+{
+  "directory": "/home/tom/CarND/CarND-Unscented-Kalman-Filter-Project",
+  "command": "/usr/bin/g++     -g3 -gdwarf-2   -std=c++0x -o CMakeFiles/UnscentedKF.dir/src/main.cpp.o -c /home/tom/CarND/CarND-Unscented-Kalman-Filter-Project/src/main.cpp",
+  "file": "/home/tom/CarND/CarND-Unscented-Kalman-Filter-Project/src/main.cpp"
+}
+]
