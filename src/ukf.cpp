@@ -5,8 +5,9 @@
  * Initializes Unscented Kalman filter
  */
 UKF::UKF() {
-  // if this is false, laser measurements will be ignored (except during init)
+  
   is_initialized_ = false;  
+  // if this is false, laser measurements will be ignored (except during init)
   use_laser_ = true;
 
   // if this is false, radar measurements will be ignored (except during init)
@@ -27,25 +28,25 @@ UKF::UKF() {
   P_aug = MatrixXd(7, 7);
 
   // Process noise standard deviation longitudinal acceleration in m/s^2
-  std_a_ = 20;
+  std_a_ = 0.5;
 
   // Process noise standard deviation yaw acceleration in rad/s^2
-  std_yawdd_ = 1;
+  std_yawdd_ =0.5;
 
   // Laser measurement noise standard deviation position1 in m
-  std_laspx_ = 0.01;
+  std_laspx_ = 0.0075;
 
   // Laser measurement noise standard deviation position2 in m
-  std_laspy_ = 0.01;
+  std_laspy_ = 0.0075;
 
   // Radar measurement noise standard deviation radius in m
-  std_radr_ = 0.17;
+  std_radr_ = 0.5;
 
   // Radar measurement noise standard deviation angle in rad
-  std_radphi_ = 0.01;
+  std_radphi_ = 0.2;
 
   // Radar measurement noise standard deviation radius change in m/s
-  std_radrd_ = 0.1;
+  std_radrd_ = 0.5;
 
   /**
   TODO:
@@ -137,10 +138,14 @@ void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
 
     if (meas_package.sensor_type_ == MeasurementPackage::RADAR) {
         // Radar updates
-        UpdateRadar(meas_package);
+        if(use_radar_==true)
+            UpdateRadar(meas_package);
+        
     } else {
         // Laser updates
-        UpdateLidar(meas_package);
+        if(use_laser_==true)
+            UpdateLidar(meas_package);
+        
 }
 
 }

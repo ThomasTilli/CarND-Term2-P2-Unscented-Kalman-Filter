@@ -10,15 +10,18 @@
 #include <stdlib.h>
 #include "tools.h"
 
+
 using namespace std;
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
 using std::vector;
+bool useOnlyRadar = false;
+bool useOnlyLidar = false;
 
 void check_arguments(int argc, char* argv[]) {
   string usage_instructions = "Usage instructions: ";
   usage_instructions += argv[0];
-  usage_instructions += " path/to/input.txt output.txt";
+  usage_instructions += " path/to/input.txt output.txt [r/l: r: only radar,l: only lidar";
 
   bool has_valid_args = false;
 
@@ -29,7 +32,11 @@ void check_arguments(int argc, char* argv[]) {
     cerr << "Please include an output file.\n" << usage_instructions << endl;
   } else if (argc == 3) {
     has_valid_args = true;
-  } else if (argc > 3) {
+  } 
+  else if (argc == 4) {
+    has_valid_args = true;
+  } 
+  else if (argc > 4) {
     cerr << "Too many arguments.\n" << usage_instructions << endl;
   }
 
@@ -37,6 +44,8 @@ void check_arguments(int argc, char* argv[]) {
     exit(EXIT_FAILURE);
   }
 }
+
+
 
 void check_files(ifstream& in_file, string& in_name,
                  ofstream& out_file, string& out_name) {
@@ -60,7 +69,19 @@ int main(int argc, char* argv[]) {
 
   string out_file_name_ = argv[2];
   ofstream out_file_(out_file_name_.c_str(), ofstream::out);
+  if(argc == 4) {
+    string mea_opt = argv[3];
 
+    if (mea_opt.compare("r")==0) {
+        useOnlyRadar=true;
+        cerr << "use only radar"<< endl;
+    } else 
+     if (mea_opt.compare("l")==0) {
+        useOnlyLidar=true;
+        cerr << "use only lidar"<< endl;
+    } 
+  }  
+ 
   check_files(in_file_, in_file_name_, out_file_, out_file_name_);
 
   /**********************************************
@@ -130,6 +151,14 @@ int main(int argc, char* argv[]) {
 
   // Create a UKF instance
   UKF ukf;
+  if (useOnlyRadar==true) {
+      ukf.use_laser_=false;
+      ukf.use_radar_=true;
+  }
+  if (useOnlyLidar==true) {
+      ukf.use_laser_=true;
+      ukf.use_radar_=false;
+  }
 
   size_t number_of_measurements = measurement_pack_list.size();
  // used to compute the RMSE later
@@ -176,7 +205,7 @@ int main(int argc, char* argv[]) {
     vx_gt = gt_pack_list[k].gt_values_(2);
     vy_gt = gt_pack_list[k].gt_values_(3);
     v_gt = sqrt(vx_gt * vx_gt + vy_gt * vy_gt);
-    yaw_gt = fabs(vx_gt) > 0.0001 ? atan(vy_gt / vx_gt) : 0;
+    yaw_gt = -(fabs(vx_gt) > 0.0001 ? atan(vy_gt / vx_gt) : 0);
     yaw_rate_gt = 0;
 
     out_file_ << x_gt << "\t";
