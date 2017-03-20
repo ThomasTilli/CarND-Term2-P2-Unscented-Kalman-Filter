@@ -206,8 +206,8 @@ int main(int argc, char* argv[]) {
     vy_gt = gt_pack_list[k].gt_values_(3);
     v_gt = sqrt(vx_gt * vx_gt + vy_gt * vy_gt);
     yaw_gt = -(fabs(vx_gt) > 0.0001 ? atan(vy_gt / vx_gt) : 0);
-    yaw_rate_gt = 0;
-
+    yaw_rate_gt = (v_gt > 0.0001 ? ((x_gt*vx_gt+y_gt*vy_gt) / v_gt) : 0);
+  
     out_file_ << x_gt << "\t";
     out_file_ << y_gt << "\t";
     out_file_ << v_gt << "\t";
