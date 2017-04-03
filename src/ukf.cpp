@@ -19,34 +19,66 @@ UKF::UKF() {
 
   // initial covariance matrix
   P_ = MatrixXd(5, 5);
-  P_ << 1, 0, 0, 0, 0,
-        0, 1, 0, 0, 0,
-        0, 0, 10, 0, 0,
-        0, 0, 0, 10, 0,
-        0, 0, 0, 0, 10;
   
+  
+ P_ <<     0.0043,   -0.0013,    0.0030,   -0.0022,   -0.0020,
+          -0.0013,    0.0077,    0.0011,    0.0071,    0.0060,
+           0.0030,    0.0011,    0.0054,    0.0007,    0.0008,
+          -0.0022,    0.0071,    0.0007,    0.0098,    0.0100,
+          -0.0020,    0.0060,    0.0008,    0.0100,    0.0123;
+  
+   
+ 
+ P_ << 1, 0, 0, 0, 0,
+        0, 1, 0, 0, 0,
+        0, 0, 500, 0, 0,
+        0, 0, 0, 500, 0,
+        0, 0, 0, 0, 0.1;
   P_aug = MatrixXd(7, 7);
 
   // Process noise standard deviation longitudinal acceleration in m/s^2
-  std_a_ = 0.5;
+  std_a_ = 0.15;
 
   // Process noise standard deviation yaw acceleration in rad/s^2
-  std_yawdd_ =0.5;
+  std_yawdd_ =0.06;
 
   // Laser measurement noise standard deviation position1 in m
-  std_laspx_ = 0.0075;
+  std_laspx_ = 0.01;
 
   // Laser measurement noise standard deviation position2 in m
-  std_laspy_ = 0.0075;
+  std_laspy_ = 0.01;
 
   // Radar measurement noise standard deviation radius in m
-  std_radr_ = 0.5;
+  std_radr_ = 0.16;
 
   // Radar measurement noise standard deviation angle in rad
-  std_radphi_ = 0.2;
+  std_radphi_ = 0.0006;
 
   // Radar measurement noise standard deviation radius change in m/s
-  std_radrd_ = 0.5;
+  std_radrd_ = 0.06;
+  
+  
+   // Process noise standard deviation longitudinal acceleration in m/s^2
+  std_a_ = 0.2;
+
+  // Process noise standard deviation yaw acceleration in rad/s^2
+  std_yawdd_ =0.2;
+
+  // Laser measurement noise standard deviation position1 in m
+  std_laspx_ = 0.01;
+
+  // Laser measurement noise standard deviation position2 in m
+  std_laspy_ = 0.01;
+
+  // Radar measurement noise standard deviation radius in m
+  std_radr_ = 0.25;
+
+  // Radar measurement noise standard deviation angle in rad
+  std_radphi_ = 0.001;
+
+  // Radar measurement noise standard deviation radius change in m/s
+  std_radrd_ = 0.07;
+  
 
   /**
   TODO:
@@ -114,8 +146,14 @@ void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
         } else if (meas_package.sensor_type_ == MeasurementPackage::LASER) {
             p_x = meas_package.raw_measurements_[0];
             p_y = meas_package.raw_measurements_[1];
+           
+           
+            
+            if(fabs(p_x==0.0)) p_x=1.0e-3;
+            if(fabs(p_y==0.0)) p_y=1.0e-3;
+             
         }
-
+        
         x_ << p_x, p_y, 0, 0, 0;
         time_us_ = meas_package.timestamp_;
 
@@ -165,13 +203,15 @@ void UKF::Prediction(double delta_t) {
     //calculate square root of P
     MatrixXd A = P_aug.llt().matrixL();
 
+  
     //create augmented sigma points
-    Xsig_.colwise() = x_aug;
-    MatrixXd offset = A * sqrt(lambda_ + n_aug_);
-
-    Xsig_.block(0, 1, n_aug_, n_aug_) += offset;
-    Xsig_.block(0, n_aug_ + 1, n_aug_, n_aug_) -= offset;
-
+    MatrixXd L = P_aug.llt().matrixL();
+    Xsig_.col(0)  = x_aug;
+    for (int i = 0; i< n_aug_; i++)
+    {
+      Xsig_.col(i+1)       = x_aug + sqrt(lambda_+n_aug_) * L.col(i);
+      Xsig_.col(i+1+n_aug_) = x_aug - sqrt(lambda_+n_aug_) * L.col(i);
+    }
 
     //predict sigma points
     for (int i = 0; i < 2 * n_aug_ + 1; i++) {
@@ -183,7 +223,7 @@ void UKF::Prediction(double delta_t) {
         double yawd = Xsig_(4, i);
         double nu_a = Xsig_(5, i);
         double nu_yawdd = Xsig_(6, i);
-
+      
         //predicted state values
         double px_p, py_p;
 
@@ -221,6 +261,8 @@ void UKF::Prediction(double delta_t) {
     for (int i = 0; i < 2 * n_aug_ + 1; i++) {  //iterate over sigma points
         x_ = x_ + weights_(i) * Xsig_pred_.col(i);
     }
+    
+    
 
     //predicted state covariance matrix
     P_.fill(0.0);
@@ -236,6 +278,10 @@ void UKF::Prediction(double delta_t) {
     }
 }
 
+/**
+ * Updates the state and the state covariance matrix using a laser measurement.
+ * @param {MeasurementPackage} meas_package
+ */
 /**
  * Updates the state and the state covariance matrix using a laser measurement.
  * @param {MeasurementPackage} meas_package
@@ -281,16 +327,6 @@ void UKF::UpdateRadar(MeasurementPackage meas_package) {
         double rho = sqrt(p_x * p_x + p_y * p_y);
         double phi = atan2(p_y, p_x);
         double rho_dot = (p_x * v_y + p_y * v_x) / rho;
-
-        if (rho != rho) {
-            rho = 0;
-        }
-        if (phi != phi) {
-            phi = 0;
-        }
-        if (rho_dot != rho_dot) {
-            rho_dot = 0;
-        }
 
         Zsig_(0, i) = rho;
         Zsig_(1, i) = phi;
