@@ -71,13 +71,17 @@ Accuracy - RMSE:
 
 [//]: # (Image References)
 [image1]: curve1.png
-[image2]: velocity1.png
-[image3]: yaw1.png
-[image4]: nis_laser1.png
-[image5]: nis_radar1.png
+[image2]: nis_laser1.png
+[image3]: nis_radar1.png
+[image4]: curve2.png
+[image5]: nis_laser2.png
+[image6]: nis_radar2.png
 
 ![alt text][image1]
 ![alt text][image2]
 ![alt text][image3]
+
+# My results as plots for sample-laser-radar-measurement-data-1.txt
 ![alt text][image4]
 ![alt text][image5]
+![alt text][image6]
