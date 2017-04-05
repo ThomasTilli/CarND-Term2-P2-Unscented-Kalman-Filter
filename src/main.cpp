@@ -176,7 +176,7 @@ int main(int argc, char* argv[]) {
   for (size_t k = 0; k < number_of_measurements; ++k) {
     // Call the UKF-based fusion
     ukf.ProcessMeasurement(measurement_pack_list[k]);
-
+    
     // output the estimation
     out_file_ << ukf.x_(0) << "\t"; // pos1 - est
     out_file_ << ukf.x_(1) << "\t"; // pos2 - est
@@ -220,8 +220,9 @@ int main(int argc, char* argv[]) {
     out_file_ << ukf.NIS_radar_ << "\n";
 
     // Store ground truth and current Kalman state
-    estimations.push_back(ukf.x_.head(2));
-    ground_truth.push_back(gt_pack_list[k].gt_values_.head(2));
+       
+    estimations.push_back(ukf.x_);
+    ground_truth.push_back(gt_pack_list[k].gt_values_);
   }
 // compute the accuracy (RMSE)
   Tools tools;
