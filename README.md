@@ -55,17 +55,17 @@ otherwise lidar and radar is used both
 
 # RMSE sample-laser-radar-measurement-data-1.txt
 Accuracy - RMSE:
-0.0809133
-0.072649
-0.615479
-0.57852
+- px: 0.0809133
+- py: 0.072649
+- vx: 0.615479
+- vy: 0.57852
 
 
 # RMSE sample-laser-radar-measurement-data-2.txt
-0.195659
-0.183123
-0.431988
-0.335083
+- px: 0.195659
+- py: 0.183123
+- vx: 0.431988
+- vy: 0.335083
 
 # My results as plots for sample-laser-radar-measurement-data-1.txt
 
