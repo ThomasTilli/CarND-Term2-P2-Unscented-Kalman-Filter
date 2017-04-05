@@ -28,63 +28,35 @@ UKF::UKF() {
           -0.0020,    0.0060,    0.0008,    0.0100,    0.0123;
   
    
- 
- P_ << 1, 0, 0, 0, 0,
-        0, 1, 0, 0, 0,
-        0, 0, 500, 0, 0,
-        0, 0, 0, 500, 0,
-        0, 0, 0, 0, 0.1;
   P_aug = MatrixXd(7, 7);
 
-  // Process noise standard deviation longitudinal acceleration in m/s^2
-  std_a_ = 0.15;
-
-  // Process noise standard deviation yaw acceleration in rad/s^2
-  std_yawdd_ =0.06;
-
-  // Laser measurement noise standard deviation position1 in m
-  std_laspx_ = 0.01;
-
-  // Laser measurement noise standard deviation position2 in m
-  std_laspy_ = 0.01;
-
-  // Radar measurement noise standard deviation radius in m
-  std_radr_ = 0.16;
-
-  // Radar measurement noise standard deviation angle in rad
-  std_radphi_ = 0.0006;
-
-  // Radar measurement noise standard deviation radius change in m/s
-  std_radrd_ = 0.06;
   
   
    // Process noise standard deviation longitudinal acceleration in m/s^2
-  std_a_ = 0.2;
+  std_a_ = 3.0;
 
   // Process noise standard deviation yaw acceleration in rad/s^2
-  std_yawdd_ =0.2;
+  std_yawdd_ =0.015;
 
   // Laser measurement noise standard deviation position1 in m
-  std_laspx_ = 0.01;
+  std_laspx_ = 0.1;
 
   // Laser measurement noise standard deviation position2 in m
-  std_laspy_ = 0.01;
+  std_laspy_ = 0.1;
 
   // Radar measurement noise standard deviation radius in m
-  std_radr_ = 0.25;
+  std_radr_ = 0.3;
 
   // Radar measurement noise standard deviation angle in rad
-  std_radphi_ = 0.001;
+  std_radphi_ = 0.1;
 
   // Radar measurement noise standard deviation radius change in m/s
-  std_radrd_ = 0.07;
+  std_radrd_ = 0.2;
   
 
   /**
   TODO:
-
   Complete the initialization. See ukf.h for other member properties.
-
   Hint: one or more values initialized above might be wildly off...
   */
   n_x_ = 5;
@@ -113,8 +85,8 @@ UKF::UKF() {
             0, 1, 0, 0, 0;
 
   R_laser_ = MatrixXd(2, 2);
-  R_laser_ << std_laspx_, 0,
-            0, std_laspy_;
+  R_laser_ << std_laspx_*std_laspx_, 0,
+            0, std_laspy_*std_laspy_;
 
   R_radar_ = MatrixXd(n_z_radar_, n_z_radar_);
   R_radar_ << std_radr_ * std_radr_, 0, 0,
@@ -312,6 +284,7 @@ void UKF::UpdateLidar(MeasurementPackage meas_package) {
  */
 void UKF::UpdateRadar(MeasurementPackage meas_package) {
   //transform sigma points into measurement space
+   
     for (int i = 0; i < 2 * n_aug_ + 1; i++) {
 
         // extract values for better readibility
